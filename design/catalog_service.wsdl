@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:tns="http://globalbooks.com/catalog"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             targetNamespace="http://globalbooks.com/catalog">
+
+    <!-- Task 3: WSDL Excerpt for CatalogService -->
+    <!-- This WSDL defines the SOAP interface for the CatalogService, enabling legacy partners to query book details.
+         Operations include retrieving individual books or lists by category.
+         Viva Explanation: WSDL follows WS-* standards (ILO2), providing contract-first design for interoperability.
+         Types ensure data consistency; bindings specify SOAP protocol for reliable messaging. -->
+
+    <!-- Types: Define data structures for Book and related elements -->
+    <types>
+        <xsd:schema targetNamespace="http://globalbooks.com/catalog">
+            <xsd:element name="getBookByIdRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="bookId" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getBookByIdResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="book" type="tns:Book"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getBooksByCategoryRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="category" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getBooksByCategoryResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="books" type="tns:BookArray"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:complexType name="Book">
+                <xsd:sequence>
+                    <xsd:element name="id" type="xsd:string"/>
+                    <xsd:element name="title" type="xsd:string"/>
+                    <xsd:element name="author" type="xsd:string"/>
+                    <xsd:element name="price" type="xsd:decimal"/>
+                    <xsd:element name="category" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="BookArray">
+                <xsd:sequence>
+                    <xsd:element name="book" type="tns:Book" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+    </types>
+
+    <!-- Messages: Define input/output for operations -->
+    <message name="getBookByIdInput">
+        <part name="parameters" element="tns:getBookByIdRequest"/>
+    </message>
+    <message name="getBookByIdOutput">
+        <part name="parameters" element="tns:getBookByIdResponse"/>
+    </message>
+    <message name="getBooksByCategoryInput">
+        <part name="parameters" element="tns:getBooksByCategoryRequest"/>
+    </message>
+    <message name="getBooksByCategoryOutput">
+        <part name="parameters" element="tns:getBooksByCategoryResponse"/>
+    </message>
+
+    <!-- PortType: Define operations -->
+    <portType name="CatalogServicePortType">
+        <operation name="getBookById">
+            <input message="tns:getBookByIdInput"/>
+            <output message="tns:getBookByIdOutput"/>
+        </operation>
+        <operation name="getBooksByCategory">
+            <input message="tns:getBooksByCategoryInput"/>
+            <output message="tns:getBooksByCategoryOutput"/>
+        </operation>
+    </portType>
+
+    <!-- Binding: Specify SOAP protocol -->
+    <binding name="CatalogServiceBinding" type="tns:CatalogServicePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="getBookById">
+            <soap:operation soapAction="getBookById"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="getBooksByCategory">
+            <soap:operation soapAction="getBooksByCategory"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+    </binding>
+
+    <!-- Service: Define endpoint -->
+    <service name="CatalogService">
+        <port name="CatalogServicePort" binding="tns:CatalogServiceBinding">
+            <soap:address location="http://localhost:8080/catalog"/>
+        </port>
+    </service>
+
+</definitions>

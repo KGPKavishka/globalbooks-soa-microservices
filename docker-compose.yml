@@ -1,0 +1,119 @@
+# Removed obsolete version attribute
+
+services:
+  # FIXED: RabbitMQ for async messaging
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # FIXED: PostgreSQL for persistence
+  postgres:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: globalbooks
+      POSTGRES_USER: globalbooks_user
+      POSTGRES_PASSWORD: globalbooks_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U globalbooks_user -d globalbooks"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # FIXED: Redis for idempotency
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # CatalogService (SOAP)
+  catalog-service:
+    build: ./services/catalog-soap
+    ports:
+      - "8081:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    volumes:
+      - ./services/catalog-soap/target:/app/target
+
+  # OrdersService (REST)
+  orders-service:
+    build: ./services/orders-rest
+    ports:
+      - "8082:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    volumes:
+      - ./services/orders-rest/target:/app/target
+
+  # PaymentsService
+  payments-service:
+    build: ./services/payments
+    ports:
+      - "8083:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis
+    volumes:
+      - ./services/payments/target:/app/target
+
+  # ShippingService (Node.js)
+  shipping-service:
+    build: ./services/shipping
+    ports:
+      - "8084:3000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - REDIS_HOST=redis
+    volumes:
+      - ./services/shipping:/app
+      - /app/node_modules
+    # Ensure dependencies are installed when /app is bind-mounted (Windows dev)
+    command: ["sh","-c","npm install --omit=dev && node app.js"]
+
+volumes:
+  rabbitmq_data:
+  postgres_data:
+  redis_data:

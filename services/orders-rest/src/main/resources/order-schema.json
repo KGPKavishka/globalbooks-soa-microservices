@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Order Creation Schema",
+    "type": "object",
+    "properties": {
+        "customerId": {
+            "type": "string",
+            "description": "Unique identifier for the customer"
+        },
+        "items": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/OrderItem"
+            },
+            "minItems": 1,
+            "description": "List of order items"
+        },
+        "totalAmount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Total order amount"
+        }
+    },
+    "required": ["customerId", "items", "totalAmount"],
+    "definitions": {
+        "OrderItem": {
+            "type": "object",
+            "properties": {
+                "bookId": {
+                    "type": "string",
+                    "description": "Identifier of the book"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Quantity of the book"
+                },
+                "price": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Price per unit"
+                }
+            },
+            "required": ["bookId", "quantity", "price"]
+        }
+    }
+}

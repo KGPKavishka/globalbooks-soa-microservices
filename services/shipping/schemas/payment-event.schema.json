@@ -1,0 +1,36 @@
+{
+  "$comment": "FIXED: add schema for runtime validation consistency with Payments' PaymentEvent",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://globalbooks.example.com/schemas/payment-event.schema.json",
+  "title": "PaymentEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "paymentId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the payment event"
+    },
+    "orderId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Associated order identifier"
+    },
+    "amount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Payment amount"
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ISO currency code (e.g., USD, EUR)"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Payment status (e.g., AUTHORIZED, CAPTURED, FAILED)"
+    }
+  },
+  "required": ["paymentId", "orderId", "amount", "currency", "status"]
+}

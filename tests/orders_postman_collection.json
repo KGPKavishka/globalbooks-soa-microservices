@@ -1,0 +1,46 @@
+{
+  "info": {
+    "name": "OrdersService API",
+    "description": "Postman collection for testing OrdersService REST API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"customerId\": \"cust123\",\n    \"items\": [\n        {\n            \"bookId\": \"1\",\n            \"quantity\": 2,\n            \"price\": 29.99\n        }\n    ],\n    \"totalAmount\": 59.98\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8082/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8082",
+          "path": ["orders"]
+        }
+      }
+    },
+    {
+      "name": "Get Order",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/orders/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8082",
+          "path": ["orders", "1"]
+        }
+      }
+    }
+  ]
+}

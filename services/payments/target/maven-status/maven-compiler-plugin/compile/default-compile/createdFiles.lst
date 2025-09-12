@@ -1,0 +1,3 @@
+com\globalbooks\payments\PaymentConsumer.class
+com\globalbooks\payments\PaymentsApplication.class
+com\globalbooks\payments\PaymentProducer.class

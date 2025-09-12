@@ -1,0 +1,4 @@
+com\globalbooks\orders\Order$OrderItem.class
+com\globalbooks\orders\OrdersApplication.class
+com\globalbooks\orders\Order.class
+com\globalbooks\orders\OrderController.class

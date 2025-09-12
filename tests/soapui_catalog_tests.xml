@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project name="CatalogService Tests" soapui-version="5.7.0"
+                    xmlns:con="http://eviware.com/soapui/config">
+
+    <!-- Task 6: SOAP UI Project for CatalogService Tests -->
+    <!-- This project tests the SOAP endpoints with functional assertions.
+         Viva Explanation: Demonstrates testing WS-* services; test cases validate operations,
+         assertions check response structure/content. Use in SOAP UI for execution. -->
+
+    <con:settings>
+        <con:setting id="GlobalProperties">@Properties@</con:setting>
+    </con:settings>
+
+    <con:interface name="CatalogService" type="wsdl">
+        <con:definition>http://localhost:8080/catalog?wsdl</con:definition>
+        <con:operations>
+            <con:operation name="getBookById" action="getBookById">
+                <con:call name="getBookById"/>
+            </con:operation>
+            <con:operation name="getBooksByCategory" action="getBooksByCategory">
+                <con:call name="getBooksByCategory"/>
+            </con:operation>
+        </con:operations>
+    </con:interface>
+
+    <con:testSuite name="CatalogService Test Suite">
+        <con:testCase name="Test Get Book By ID">
+            <con:testStep type="request" name="getBookById Request">
+                <con:settings>
+                    <con:setting id="Endpoint">http://localhost:8080/catalog</con:setting>
+                </con:settings>
+                <con:request>
+                    <con:endpoint>http://localhost:8080/catalog</con:endpoint>
+                    <con:operation>getBookById</con:operation>
+                    <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cat="http://globalbooks.com/catalog">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cat:getBookByIdRequest>
+         <cat:bookId>1</cat:bookId>
+      </cat:getBookByIdRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+                </con:request>
+                <con:assertions>
+                    <con:assertion type="SOAP Response" name="SOAP Response">
+                        <con:configuration/>
+                    </con:assertion>
+                    <con:assertion type="XPath Match" name="Check Book ID">
+                        <con:configuration>
+                            <con:path>//book/id</con:path>
+                            <con:expectedContent>1</con:expectedContent>
+                        </con:configuration>
+                    </con:assertion>
+                    <con:assertion type="XPath Match" name="Check Title">
+                        <con:configuration>
+                            <con:path>//book/title</con:path>
+                            <con:expectedContent>Java SOA</con:expectedContent>
+                        </con:configuration>
+                    </con:assertion>
+                </con:assertions>
+            </con:testStep>
+        </con:testCase>
+
+        <con:testCase name="Test Get Books By Category">
+            <con:testStep type="request" name="getBooksByCategory Request">
+                <con:settings>
+                    <con:setting id="Endpoint">http://localhost:8080/catalog</con:setting>
+                </con:settings>
+                <con:request>
+                    <con:endpoint>http://localhost:8080/catalog</con:endpoint>
+                    <con:operation>getBooksByCategory</con:operation>
+                    <con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cat="http://globalbooks.com/catalog">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <cat:getBooksByCategoryRequest>
+         <cat:category>Technology</cat:category>
+      </cat:getBooksByCategoryRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+                </con:request>
+                <con:assertions>
+                    <con:assertion type="SOAP Response" name="SOAP Response">
+                        <con:configuration/>
+                    </con:assertion>
+                    <con:assertion type="XPath Match" name="Check Book Count">
+                        <con:configuration>
+                            <con:path>count(//book)</con:path>
+                            <con:expectedContent>2</con:expectedContent>
+                        </con:configuration>
+                    </con:assertion>
+                </con:assertions>
+            </con:testStep>
+        </con:testCase>
+    </con:testSuite>
+
+</con:soapui-project>

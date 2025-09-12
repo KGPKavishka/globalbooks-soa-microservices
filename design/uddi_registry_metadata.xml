@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uddi:save_business xmlns:uddi="urn:uddi-org:api_v3">
+    <!-- Task 4: UDDI Registry Entry Metadata for CatalogService -->
+    <!-- This metadata enables dynamic discovery of the CatalogService by clients.
+         UDDI provides a centralized registry for SOA, supporting interoperability.
+         Viva Explanation: Follows OASIS UDDI v3 standard; businessEntity describes provider,
+         businessService lists offerings, bindingTemplate links to WSDL for invocation. -->
+
+    <businessEntity businessKey="uddi:globalbooks.com:business-entity">
+        <name xml:lang="en">GlobalBooks Inc.</name>
+        <description xml:lang="en">Global e-commerce platform for book sales and distribution.</description>
+        <businessServices>
+            <businessService serviceKey="uddi:globalbooks.com:catalog-service" businessKey="uddi:globalbooks.com:business-entity">
+                <name xml:lang="en">CatalogService</name>
+                <description xml:lang="en">SOAP service for querying book catalog details.</description>
+                <bindingTemplates>
+                    <bindingTemplate bindingKey="uddi:globalbooks.com:catalog-binding" serviceKey="uddi:globalbooks.com:catalog-service">
+                        <description xml:lang="en">SOAP binding for CatalogService operations.</description>
+                        <accessPoint useType="endpoint">http://localhost:8080/catalog</accessPoint>
+                        <tModelInstanceDetails>
+                            <tModelInstanceInfo tModelKey="uddi:globalbooks.com:catalog-wsdl">
+                                <description xml:lang="en">Reference to CatalogService WSDL.</description>
+                                <instanceDetails>
+                                    <overviewDoc>
+                                        <description xml:lang="en">WSDL document for CatalogService.</description>
+                                        <overviewURL>http://localhost:8080/catalog?wsdl</overviewURL>
+                                    </overviewDoc>
+                                </instanceDetails>
+                            </tModelInstanceInfo>
+                        </tModelInstanceDetails>
+                    </bindingTemplate>
+                </bindingTemplates>
+            </businessService>
+        </businessServices>
+    </businessEntity>
+
+    <!-- tModel for WSDL reference -->
+    <tModel tModelKey="uddi:globalbooks.com:catalog-wsdl">
+        <name xml:lang="en">CatalogService WSDL</name>
+        <description xml:lang="en">Technical model referencing the WSDL for CatalogService.</description>
+        <overviewDoc>
+            <description xml:lang="en">WSDL specification for service interface.</description>
+            <overviewURL>http://localhost:8080/catalog?wsdl</overviewURL>
+        </overviewDoc>
+        <categoryBag>
+            <keyedReference tModelKey="uddi:uddi.org:categorization:types" keyName="wsdlSpec" keyValue="wsdlDeployment"/>
+        </categoryBag>
+    </tModel>
+
+</uddi:save_business>

@@ -1,0 +1,28 @@
+# RabbitMQ Configuration for GlobalBooks SOA
+# Task 10: Queue definitions, producers/consumers
+# Viva Explanation: Defines exchange, queues, bindings for async messaging between Payments and Shipping.
+
+exchanges:
+  - name: globalbooks.exchange
+    type: topic
+    durable: true
+
+queues:
+  - name: payments.queue
+    durable: true
+  - name: shipping.queue
+    durable: true
+
+bindings:
+  - exchange: globalbooks.exchange
+    queue: payments.queue
+    routing_key: order.created
+  - exchange: globalbooks.exchange
+    queue: payments.queue
+    routing_key: payment.process
+  - exchange: globalbooks.exchange
+    queue: shipping.queue
+    routing_key: shipping.process
+
+# Producers: PaymentsService sends to payments.queue
+# Consumers: ShippingService listens to shipping.queue

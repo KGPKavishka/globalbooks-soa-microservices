@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process name="PlaceOrderProcess"
+         targetNamespace="http://globalbooks.com/bpel/placeorder"
+         xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:tns="http://globalbooks.com/bpel/placeorder"
+         xmlns:cat="http://globalbooks.com/catalog"
+         xmlns:ord="http://globalbooks.com/orders">
+
+    <!-- Task 8: BPEL PlaceOrder Process Definition -->
+    <!-- Orchestrates order placement: receives request, looks up prices via CatalogService,
+         creates order via OrdersService, replies to client.
+         Viva Explanation: Demonstrates orchestration (ILO1); BPEL enables workflow composition
+         across services. Deploy on Apache ODE. -->
+
+    <import location="CatalogService.wsdl" namespace="http://globalbooks.com/catalog"/>
+    <import location="OrdersService.wsdl" namespace="http://globalbooks.com/orders"/>
+
+    <partnerLinks>
+        <partnerLink name="CatalogServicePL" partnerLinkType="cat:CatalogServicePLT" myRole="client"/>
+        <partnerLink name="OrdersServicePL" partnerLinkType="ord:OrdersServicePLT" myRole="client"/>
+        <partnerLink name="ClientPL" partnerLinkType="tns:PlaceOrderPLT" partnerRole="client"/>
+    </partnerLinks>
+
+    <variables>
+        <variable name="PlaceOrderRequest" messageType="tns:PlaceOrderRequestMessage"/>
+        <variable name="PlaceOrderResponse" messageType="tns:PlaceOrderResponseMessage"/>
+        <variable name="CatalogRequest" messageType="cat:getBookByIdRequest"/>
+        <variable name="CatalogResponse" messageType="cat:getBookByIdResponse"/>
+        <variable name="OrderRequest" messageType="ord:createOrderRequest"/>
+        <variable name="OrderResponse" messageType="ord:createOrderResponse"/>
+    </variables>
+
+    <sequence>
+        <!-- Receive order request from client -->
+        <receive name="ReceiveOrderRequest" partnerLink="ClientPL"
+                 portType="tns:PlaceOrderPT" operation="PlaceOrder"
+                 variable="PlaceOrderRequest" createInstance="yes"/>
+
+        <!-- Loop through items to get prices from CatalogService -->
+        <forEach name="LookupPrices" parallel="no" counterName="itemIndex">
+            <startCounterValue>1</startCounterValue>
+            <finalCounterValue>count($PlaceOrderRequest.items)</finalCounterValue>
+            <scope>
+                <sequence>
+                    <assign name="PrepareCatalogRequest">
+                        <copy>
+                            <from>$PlaceOrderRequest.items[$itemIndex]/bookId</from>
+                            <to>$CatalogRequest.bookId</to>
+                        </copy>
+                    </assign>
+                    <invoke name="InvokeCatalogService" partnerLink="CatalogServicePL"
+                            portType="cat:CatalogServicePT" operation="getBookById"
+                            inputVariable="CatalogRequest" outputVariable="CatalogResponse"/>
+                    <assign name="UpdateItemPrice">
+                        <copy>
+                            <from>$CatalogResponse.book.price</from>
+                            <to>$PlaceOrderRequest.items[$itemIndex]/price</to>
+                        </copy>
+                    </assign>
+                </sequence>
+            </scope>
+        </forEach>
+
+        <!-- Invoke OrdersService to create order -->
+        <assign name="PrepareOrderRequest">
+            <copy>
+                <from>$PlaceOrderRequest</from>
+                <to>$OrderRequest</to>
+            </copy>
+        </assign>
+        <invoke name="InvokeOrdersService" partnerLink="OrdersServicePL"
+                portType="ord:OrdersServicePT" operation="createOrder"
+                inputVariable="OrderRequest" outputVariable="OrderResponse"/>
+
+        <!-- Reply to client -->
+        <assign name="PrepareResponse">
+            <copy>
+                <from>$OrderResponse</from>
+                <to>$PlaceOrderResponse</to>
+            </copy>
+        </assign>
+        <reply name="ReplyToClient" partnerLink="ClientPL"
+               portType="tns:PlaceOrderPT" operation="PlaceOrder"
+               variable="PlaceOrderResponse"/>
+    </sequence>
+
+</process>

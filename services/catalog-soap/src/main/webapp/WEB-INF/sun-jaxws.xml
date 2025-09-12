@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime"
+           version="2.0">
+
+    <!-- Task 5: sun-jaxws.xml for CatalogService -->
+    <!-- Configures JAX-WS runtime for endpoint deployment.
+         Viva Explanation: Specifies implementation class and URL pattern; enables WSDL generation at runtime.
+         Supports WS-Security integration for SOAP. -->
+
+    <endpoint name="CatalogService"
+              implementation="com.globalbooks.catalog.CatalogService"
+              url-pattern="/catalog"/>
+
+</endpoints>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FIXED: Use logstash JSON encoder for structured logs with correlationId and exception stack traces -->
+<configuration>
+
+    <!-- FIXED: Console appender with JSON output -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender"> <!-- FIXED -->
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder"> <!-- FIXED -->
+            <providers> <!-- FIXED: Explicit providers to control fields -->
+                <timestamp> <!-- FIXED: timestamp field -->
+                    <timeZone>UTC</timeZone> <!-- FIXED -->
+                    <fieldName>timestamp</fieldName> <!-- FIXED -->
+                </timestamp>
+                <version/> <!-- FIXED: encoder version -->
+                <level> <!-- FIXED: log level -->
+                    <fieldName>level</fieldName> <!-- FIXED -->
+                </level>
+                <threadName> <!-- FIXED: thread name -->
+                    <fieldName>thread</fieldName> <!-- FIXED -->
+                </threadName>
+                <loggerName> <!-- FIXED: logger name -->
+                    <fieldName>logger</fieldName> <!-- FIXED -->
+                    <shortenLoggerName>true</shortenLoggerName> <!-- FIXED -->
+                </loggerName>
+                <message/> <!-- FIXED: log message -->
+                <mdc> <!-- FIXED: include only correlationId keys if present -->
+                    <includeMdcKeyName>correlationId</includeMdcKeyName> <!-- FIXED -->
+                    <includeMdcKeyName>X-Correlation-Id</includeMdcKeyName> <!-- FIXED -->
+                </mdc>
+                <stackTrace> <!-- FIXED: include exception stack traces -->
+                    <fieldName>exception</fieldName> <!-- FIXED -->
+                </stackTrace>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- FIXED: Default logging levels -->
+    <root level="INFO"> <!-- FIXED -->
+        <appender-ref ref="JSON_CONSOLE"/> <!-- FIXED -->
+    </root>
+
+    <!-- FIXED: Set application package to DEBUG for richer diagnostics -->
+    <logger name="com.globalbooks.payments" level="DEBUG"/> <!-- FIXED -->
+
+</configuration>
